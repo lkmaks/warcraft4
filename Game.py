@@ -9,12 +9,14 @@ from GameState import GameState
 class Game:
     def __init__(self, player1, player2):
         pygame.init()
+        pygame.font.init()
         self.player1 = player1
         self.player2 = player2
         self.board = Board(self)
-        self.cpanel = CPanel(self, 400, self.board.real_size_with_offsets()[1])
 
         bw, bh = self.board.real_size_with_offsets()
+
+        self.cpanel = CPanel(self, bw, 0, 400, self.board.real_size_with_offsets()[1])
         self.screen = pygame.display.set_mode((bw + self.cpanel.width, bh))
         self.clock = pygame.time.Clock()
 
@@ -31,7 +33,7 @@ class Game:
             if self.gamestate.state == 0:
                 unit = self.board.units_array[cell[0]][cell[1]]
                 if not unit is None and \
-                    unit.isowned(self.gamestate.player):
+                    unit.owner == self.gamestate.player:
                     self.gamestate.state = 1
                     self.gamestate.chosen_unit = unit
                     unit.chosen = True
@@ -59,3 +61,4 @@ class Game:
                     self.handle_mouseup(event.pos, event.button)
             self.render()
             pygame.display.flip()
+

@@ -1,5 +1,7 @@
 import pygame
 from Constants import Colors
+from Units import Unit
+
 
 class Board:
     def __init__(self, game):
@@ -13,6 +15,9 @@ class Board:
         self.game = game
 
         self.units_array = [[None] * self.height for _ in range(self.width)]
+
+        self.units_array[1][1] = Unit(100, 10, 2, 'footman', 1, (1, 1), self.game.player1, 1, self)
+        self.units_array[4][4] = Unit(60, 20, 2, 'grunt', 1, (4, 4), self.game.player2, 1, self)
 
     def real_size(self):
         return (self.height * self.cell_size, self.width * self.cell_size)
