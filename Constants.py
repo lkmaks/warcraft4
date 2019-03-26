@@ -3,3 +3,4 @@ class Colors:
     BLACK = (0, 0, 0)
     PINKRED = (128, 0, 0)
     GREENLOW = (130, 200, 130)
+    PINKPINKRED = (255, 200, 200)

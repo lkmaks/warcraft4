@@ -95,8 +95,8 @@ class Unit():
 
 class UnitFactory:
     unit_cost = {'footman': 4, 'grunt': 5}
-    unit_names = {'human': set(['footman']),
-                  'horde': set(['grunt'])}
+    unit_names = {'human': {'footman'},
+                  'horde': {'grunt'}}
     def __init__(self, player, game):
         self.player = player
         self.game = game

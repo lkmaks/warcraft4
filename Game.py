@@ -56,6 +56,15 @@ class Game:
     def handle_keyup(self, key):
         if key == ord('e'):
             self.endmove()
+        elif key == ord('f') and self.gamestate.player.race == 'human':
+            self.choose_unit_to_train('footman')
+        elif key == ord('g') and self.gamestate.player.race == 'horde':
+            self.choose_unit_to_train('grunt')
+
+    def choose_unit_to_train(self, name):
+        self.gamestate.state = 2
+        # gamestate 2: ready to drop unit
+        self.gamestate.chosen_unit = name
 
     def handle_mouseup(self, pos, mouse_button):
         print(self.gamestate.__dict__)
@@ -96,11 +105,8 @@ class Game:
             if button == 'endmove':
                 self.endmove()
             elif button.startswith('train_'):
-                print('?')
                 name = button[6:]
-                self.gamestate.state = 2
-                # gamestate 2: ready to rop unit
-                self.gamestate.chosen_unit = name
+                self.choose_unit_to_train(name)
 
 
 

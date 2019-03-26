@@ -58,6 +58,7 @@ class CPanel:
         self.human_unit_train_buttons = []
         self.human_unit_train_buttons.append(self.train_human_button)
 
+
         self.buttons['player1'] = self.player1_button
         self.buttons['player2'] = self.player2_button
         self.buttons['endmove'] = self.endmove_button
@@ -82,8 +83,13 @@ class CPanel:
                 else:
                     but.set_text(but.text[:pos + 2] + str(money))
 
+            but_color = but.color
+            if but.id.startswith('train_'):
+                name = but.id[6:]
+                if name == self.game.gamestate.chosen_unit:
+                    but_color = Colors.PINKPINKRED
 
-            pygame.draw.rect(self.game.screen, but.color, but.rect)
+            pygame.draw.rect(self.game.screen, but_color, but.rect)
             if but.text_surface:
                 self.game.screen.blit(but.text_surface, (but.rect.left + but.left, but.rect.top + but.top))
 
