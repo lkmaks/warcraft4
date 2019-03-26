@@ -5,4 +5,3 @@ class GameState:
         self.player = player
         self.state = 0
         self.chosen_unit = None
-

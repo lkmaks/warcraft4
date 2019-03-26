@@ -16,9 +16,6 @@ class Board:
 
         self.units_array = [[None] * self.height for _ in range(self.width)]
 
-        self.units_array[1][1] = Unit(100, 10, 2, 'footman', 1, (1, 1), self.game.player1, 1, self)
-        self.units_array[4][4] = Unit(60, 20, 2, 'grunt', 1, (4, 4), self.game.player2, 1, self)
-
     def real_size(self):
         return (self.height * self.cell_size, self.width * self.cell_size)
 
@@ -58,3 +55,6 @@ class Board:
         """ returns coordinate on screen for left top corner of the cell """
         i, j = cell
         return (self.left_offset + i * self.cell_size, self.top_offset + j * self.cell_size)
+
+    def can_drop_unit_to(self, cell, player):
+        return self.units_array[cell[0]][cell[1]] is None
