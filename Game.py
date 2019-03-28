@@ -31,7 +31,7 @@ class Game:
 
         self.gamestate = GameState(player1, self)
 
-        self.rules = Rules(Game)
+        self.rules = Rules(self)
 
     def render(self):
         self.board.render()
@@ -52,8 +52,14 @@ class Game:
                     self.board.units_array[i][j].end_of_their_move()
         self.gamestate.player = self.player1 if self.gamestate.player == self.player2 else self.player2
         self.cpanel.endmove()
-        self.player1.money += self.rules.gold_add()
-        self.player2.money += self.rules.gold_add()
+        self.player1.gold += self.rules.gold_add(self.player1)
+        self.player2.gold += self.rules.gold_add(self.player2)
+
+        res = self.rules.game_result()
+        if res != 0:
+            print('Player {} win!!!'.format(res))
+            exit(0)
+
 
     def handle_keyup(self, key):
         zero = self.gamestate.state == 0
@@ -69,6 +75,10 @@ class Game:
             self.try_choose_unit_to_train('rifleman')
         elif key == ord('h') and zero:
             self.try_choose_unit_to_train('headhunter')
+        elif key == ord('p') and zero:
+            self.try_choose_unit_to_train('priest')
+        elif key == ord('b') and zero:
+            self.try_choose_unit_to_train('bomber')
 
 
     def try_choose_unit_to_train(self, name):
@@ -78,7 +88,6 @@ class Game:
             self.gamestate.chosen_unit = name
 
     def handle_mouseup(self, pos, mouse_button):
-        print(self.gamestate.__dict__)
         cell = self.board.get_cell(pos)
         button = self.cpanel.get_button(pos)
 

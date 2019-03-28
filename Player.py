@@ -1,8 +1,8 @@
 
 
 class Player:
-    def __init__(self, race, start_money, name='Rexar', factory=None):
+    def __init__(self, race, start_gold, name='Rexar', factory=None):
         self.race = race
         self.name = name
-        self.money = start_money
+        self.gold = start_gold
         self.factory = None

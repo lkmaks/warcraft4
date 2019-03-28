@@ -32,16 +32,16 @@ class CPanel:
         r = Rect(self.left, self.top, 220, 50)
         self.endmove_button = Button('endmove', r, 'End move', Colors.PINKRED, 55, 15, (150, 200, 205))
 
-        r = Rect(self.left, self.top + 60, 220, 50)
-        self.player1_button = Button('player1', r, 'Player 1: {}'.format(self.game.player1.name), Colors.GREENLOW, 20, 15)
+        r = Rect(self.left, self.top + 60, 280, 50)
+        self.player1_button = Button('player1', r, 'Player 1 ({}): '.format(self.game.player1.name), Colors.GREENLOW, 20, 15)
 
-        r = Rect(self.left, self.top + 120, 220, 50)
-        self.player2_button = Button('player2', r, 'Player 2: {}'.format(self.game.player2.name), Colors.GREENLOW, 20, 15)
+        r = Rect(self.left, self.top + 120, 280, 50)
+        self.player2_button = Button('player2', r, 'Player 2 ({}): '.format(self.game.player2.name), Colors.GREENLOW, 20, 15)
 
-        r = Rect(self.left + 200, self.top + 80, 10, 10)
+        r = Rect(self.left + 260, self.top + 80, 10, 10)
         self.player1_move_button = Button('player1_move_button', r, '', Colors.PINKRED, 0, 0)
 
-        r = Rect(self.left + 200, self.top + 140, 10, 10)
+        r = Rect(self.left + 260, self.top + 140, 10, 10)
         self.player2_move_button = Button('player2_move_button', r, '', Colors.PINKRED, 0, 0)
 
 
@@ -49,15 +49,19 @@ class CPanel:
         self.player1_train_buttons = []
         i = 0
         for name in self.game.player1.factory.unit_names:
-            r = Rect(self.left, self.top + 180 + i * 40, 180, 30)
-            self.player1_train_buttons.append(Button('train_{}'.format(name), r, name.capitalize(), Colors.GREENLOW, 10, 4))
+            r = Rect(self.left, self.top + 180 + i * 40, 220, 30)
+            unit_str = name.capitalize() + ' ({} gold)'.format(self.game.player1.factory.unit_cost[name])
+            self.player1_train_buttons.append(Button('train_{}'.format(name), r,
+                                                     unit_str, Colors.GREENLOW, 10, 4))
             i += 1
 
         self.player2_train_buttons = []
         i = 0
         for name in self.game.player2.factory.unit_names:
-            r = Rect(self.left, self.top + 180 + i * 40, 180, 30)
-            self.player2_train_buttons.append(Button('train_{}'.format(name), r, name.capitalize(), Colors.GREENLOW, 10, 4))
+            r = Rect(self.left, self.top + 180 + i * 40, 220, 30)
+            unit_str = name.capitalize() + ' ({} gold)'.format(self.game.player2.factory.unit_cost[name])
+            self.player2_train_buttons.append(Button('train_{}'.format(name), r,
+                                                     unit_str, Colors.GREENLOW, 10, 4))
             i += 1
 
 
@@ -72,14 +76,14 @@ class CPanel:
         for key in self.buttons:
             but = self.buttons[key]
 
-            # update players money
+            # update players gold
             if but.id == 'player1' or but.id == 'player2':
                 pos = but.text.find(': ')
-                money = self.game.player1.money if but.id == 'player1' else self.game.player2.money
+                gold = self.game.player1.gold if but.id == 'player1' else self.game.player2.gold
                 if pos == -1:
-                    but.set_text(but.text + ': ' + str(money))
+                    but.set_text(but.text + ': ' + str(gold))
                 else:
-                    but.set_text(but.text[:pos + 2] + str(money))
+                    but.set_text(but.text[:pos + 2] + str(gold))
 
             but_color = but.color
             if but.id.startswith('train_'):

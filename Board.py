@@ -1,7 +1,7 @@
 import pygame
 from Constants import Colors
 from Units import Unit
-
+from mapgen import mapgen
 
 class Board:
     def __init__(self, game):
@@ -15,6 +15,10 @@ class Board:
         self.game = game
 
         self.units_array = [[None] * self.height for _ in range(self.width)]
+        self.is_gold = [[False] * self.height for _ in range(self.width)]
+        self.spawn1 = [[False] * self.height for _ in range(self.width)]
+        self.spawn2 = [[False] * self.height for _ in range(self.width)]
+        mapgen(self.is_gold, self.spawn1, self.spawn2)
 
     def real_size(self):
         return (self.height * self.cell_size, self.width * self.cell_size)
@@ -39,6 +43,15 @@ class Board:
 
         for i in range(self.width):
             for j in range(self.height):
+                x, y = self.get_coords((i, j))
+                if self.is_gold[i][j]:
+                    pygame.draw.rect(self.game.screen, Colors.GOLD, (x + 1, y + 1, self.cell_size - 1, self.cell_size - 1))
+                elif self.spawn1[i][j]:
+                    pygame.draw.rect(self.game.screen, Colors.PLAYER_1_SPAWN,
+                                     (x + 1, y + 1, self.cell_size - 1, self.cell_size - 1))
+                elif self.spawn2[i][j]:
+                    pygame.draw.rect(self.game.screen, Colors.PLAYER_2_SPAWN,
+                                     (x + 1, y + 1, self.cell_size - 1, self.cell_size - 1))
                 if self.units_array[i][j]:
                     self.units_array[i][j].render()
 
@@ -57,4 +70,5 @@ class Board:
         return (self.left_offset + i * self.cell_size, self.top_offset + j * self.cell_size)
 
     def can_drop_unit_to(self, cell, player):
-        return self.units_array[cell[0]][cell[1]] is None
+        arr = self.spawn1 if player == self.game.player1 else self.spawn2
+        return self.units_array[cell[0]][cell[1]] is None and arr[cell[0]][cell[1]]

@@ -22,7 +22,7 @@
     "attack_dist": 4,
     "attack_type": "airground",
     "moves_start": 2,
-    "cost": 10,
+    "cost": 9,
     "race": "human"
   },
   "priest": {
@@ -65,4 +65,19 @@
     "cost": 7,
     "race": "horde"
   },
+  "bomber": {
+    "hp": 45,
+    "max_hp": 45,
+    "damage": 3,
+    "speed": 1,
+    "regen": 2,
+    "type": "ground",
+    "attack_dist": 1,
+    "attack_type": "ground",
+    "moves_start": 2,
+    "cost": 10,
+    "bomb_damage": 40,
+    "bomb_radius": 1,
+    "race": "horde"
+  }
 }

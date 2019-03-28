@@ -32,15 +32,31 @@ class Unit():
         self.board.units_array[cell[0]][cell[1]] = self
         self.cell = cell
 
-    def attack(self, unit):
+    def attack(self, unit, damage=None):
         """ a """
-        unit.hp -= self.damage
+        unit.hp -= (damage if damage else self.damage)
         if unit.hp <= 0:
             unit.die()
         return True
 
     def act_with_ally(self, unit):
-        return False
+        if self.name == "priest":
+            unit.hp += self.heal
+            unit.hp = min(unit.hp, unit.max_hp)
+        if self.name == "bomber" and unit == self:
+            for r in range(1, self.bomb_radius + 1):
+                s = set()
+                x, y = self.cell
+                for i in range(-r, r + 1):
+                    s.add((x + r, y + i))
+                    s.add((x - r, y + i))
+                    s.add((x + i, y + r))
+                    s.add((x + i, y - r))
+                for pos in s:
+                    other_unit = self.board.units_array[pos[0]][pos[1]]
+                    if not other_unit is None:
+                        self.attack(other_unit, self.bomb_damage)
+                self.die()
 
     def able(self, cell):
         if self.moves_left == 0:
@@ -102,7 +118,7 @@ class UnitFactory:
                     self.unit_cost[key] = data[key]['cost']
 
     def creatable(self, name, cell):
-        if self.player.money < self.unit_cost[name]:
+        if self.player.gold < self.unit_cost[name]:
             return False
         if not self.game.board.can_drop_unit_to(cell, self.player):
             return False
@@ -115,14 +131,14 @@ class UnitFactory:
         """ Same as creatable, but without the context of cell """
         if name not in self.unit_names:
             return False
-        if self.player.money < self.unit_cost[name]:
+        if self.player.gold < self.unit_cost[name]:
             return False
         return True
 
     def create_unit(self, name, cell):
         """
         creates unit owned by <player> with given name and proper characteristics, putting him in the <cell>
-        assume it is possible - that means player has enough money, can drop unit on the cell and can produce this type
+        assume it is possible - that means player has enough gold, can drop unit on the cell and can produce this type
         """
         with open('units_data.json', 'r') as file:
             data = json.loads(file.read(), encoding='utf-8')
@@ -138,5 +154,5 @@ class UnitFactory:
         if unit is None:
             return None
         self.game.board.units_array[cell[0]][cell[1]] = unit
-        self.player.money -= unit.cost
+        self.player.gold -= unit.cost
         return self.game.board.units_array[cell[0]][cell[1]]
