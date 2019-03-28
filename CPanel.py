@@ -45,30 +45,28 @@ class CPanel:
         self.player2_move_button = Button('player2_move_button', r, '', Colors.PINKRED, 0, 0)
 
 
-        r = Rect(self.left, self.top + 180, 80, 30)
-        self.train_grunt_button = Button('train_grunt', r, 'Grunt', Colors.GREENLOW, 10, 4)
 
-        self.orc_unit_train_buttons = []
-        self.orc_unit_train_buttons.append(self.train_grunt_button)
+        self.player1_train_buttons = []
+        i = 0
+        for name in self.game.player1.factory.unit_names:
+            r = Rect(self.left, self.top + 180 + i * 40, 180, 30)
+            self.player1_train_buttons.append(Button('train_{}'.format(name), r, name.capitalize(), Colors.GREENLOW, 10, 4))
+            i += 1
 
-
-        r = Rect(self.left, self.top + 180, 110, 30)
-        self.train_human_button = Button('train_footman', r, 'Footman', Colors.GREENLOW, 10, 4)
-
-        self.human_unit_train_buttons = []
-        self.human_unit_train_buttons.append(self.train_human_button)
+        self.player2_train_buttons = []
+        i = 0
+        for name in self.game.player2.factory.unit_names:
+            r = Rect(self.left, self.top + 180 + i * 40, 180, 30)
+            self.player2_train_buttons.append(Button('train_{}'.format(name), r, name.capitalize(), Colors.GREENLOW, 10, 4))
+            i += 1
 
 
         self.buttons['player1'] = self.player1_button
         self.buttons['player2'] = self.player2_button
         self.buttons['endmove'] = self.endmove_button
         self.buttons['player1_move'] = self.player1_move_button
-        if self.game.player1.race == 'horde':
-            for but in self.orc_unit_train_buttons:
-                self.buttons[but.id] = but
-        elif self.game.player1.race == 'human':
-            for but in self.human_unit_train_buttons:
-                self.buttons[but.id] = but
+        for but in self.player1_train_buttons:
+            self.buttons[but.id] = but
 
     def render(self):
         for key in self.buttons:
@@ -100,18 +98,16 @@ class CPanel:
                 return e
 
     def endmove(self):
+        for key in list(self.buttons.keys()):
+            if key.startswith('train'):
+                del self.buttons[key]
         if 'player1_move' in self.buttons.keys():
             del self.buttons['player1_move']
             self.buttons['player2_move'] = self.player2_move_button
+            for but in self.player2_train_buttons:
+                self.buttons[but.id] = but
         elif 'player2_move' in self.buttons.keys():
             del self.buttons['player2_move']
             self.buttons['player1_move'] = self.player1_move_button
-        for but in self.human_unit_train_buttons + self.orc_unit_train_buttons:
-            if but.id in self.buttons.keys():
-                del self.buttons[but.id]
-        if self.game.gamestate.player.race == 'horde':
-            for but in self.orc_unit_train_buttons:
-                self.buttons[but.id] = but
-        elif self.game.gamestate.player.race == 'human':
-            for but in self.human_unit_train_buttons:
+            for but in self.player1_train_buttons:
                 self.buttons[but.id] = but

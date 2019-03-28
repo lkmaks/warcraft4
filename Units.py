@@ -1,6 +1,7 @@
 import pygame
 from pygame import Rect
 from Constants import Colors
+import json
 
 
 def dist(a, b):
@@ -12,22 +13,16 @@ def attack_is_possible(type1, type2):
 
 
 class Unit():
-    def __init__(self, name, hp, max_hp, damage, speed, regen, type, attack_dist, cell, owner, moves_start, cost, board):
-        self.type = type
-        self.hp = hp
-        self.max_hp = max_hp
-        self.damage = damage
-        self.speed = speed
-        self.attack_dist = attack_dist
-        self.cell = cell
-        self.board = board
+    def __init__(self, kwargs):
+        self.cell = self.board = self.owner = self.name = None
+        self.hp = self.max_hp = self.damage = self.speed = None
+        self.regen = self.type = self.attack_dist = self.cell = None
+        self.owner = self.moves_start = self.cost = self.board = None
+
+        for key in kwargs:
+            self.__setattr__(key, kwargs[key])
         self.chosen = False
-        self.owner = owner
-        self.moves_left = moves_start
-        self.moves_start = moves_start
-        self.regen = regen
-        self.cost = cost
-        self.name = name
+        self.moves_left = self.moves_start
 
     def die(self):
         self.board.units_array[self.cell[0]][self.cell[1]] = None
@@ -94,19 +89,33 @@ class Unit():
 
 
 class UnitFactory:
-    unit_cost = {'footman': 4, 'grunt': 5}
-    unit_names = {'human': {'footman'},
-                  'horde': {'grunt'}}
     def __init__(self, player, game):
         self.player = player
         self.game = game
+        self.unit_names = set()
+        self.unit_cost = dict()
+        with open('units_data.json') as file:
+            data = json.loads(file.read())
+            for key in data:
+                if data[key]['race'] == self.player.race:
+                    self.unit_names.add(key)
+                    self.unit_cost[key] = data[key]['cost']
 
     def creatable(self, name, cell):
         if self.player.money < self.unit_cost[name]:
             return False
         if not self.game.board.can_drop_unit_to(cell, self.player):
             return False
-        if name not in self.unit_names[self.player.race]:
+        if name not in self.unit_names:
+            return False
+        return True
+
+
+    def affordable(self, name):
+        """ Same as creatable, but without the context of cell """
+        if name not in self.unit_names:
+            return False
+        if self.player.money < self.unit_cost[name]:
             return False
         return True
 
@@ -115,15 +124,16 @@ class UnitFactory:
         creates unit owned by <player> with given name and proper characteristics, putting him in the <cell>
         assume it is possible - that means player has enough money, can drop unit on the cell and can produce this type
         """
+        with open('units_data.json', 'r') as file:
+            data = json.loads(file.read(), encoding='utf-8')
         unit = None
-        if name == 'footman':
-            unit = Unit(name='footman', hp=60, max_hp=60, damage=10, speed=1,
-                        regen=2, type='ground', attack_dist=1, cell=cell,
-                        owner=self.player, moves_start=2, cost=4, board=self.game.board)
-        elif name == 'grunt':
-            unit = Unit(name='grunt', hp=100, max_hp=100, damage=12, speed=1,
-                        regen=3, type='ground', attack_dist=1, cell=cell,
-                        owner=self.player, moves_start=2, cost=5, board=self.game.board)
+        if name in data.keys():
+            dc = data[name]
+            dc['name'] = name
+            dc['cell'] = cell
+            dc['board'] = self.game.board
+            dc['owner'] = self.player
+            unit = Unit(dc)
 
         if unit is None:
             return None
