@@ -1,0 +1,83 @@
+{
+  "footman": {
+    "hp": 80,
+    "max_hp": 80,
+    "damage": 10,
+    "speed": 1,
+    "regen": 4,
+    "type": "ground",
+    "attack_dist": 1,
+    "attack_type": "ground",
+    "moves_start": 2,
+    "cost": 4,
+    "race": "human"
+  },
+  "rifleman": {
+    "hp": 60,
+    "max_hp": 60,
+    "damage": 17,
+    "speed": 1,
+    "regen": 2,
+    "type": "ground",
+    "attack_dist": 4,
+    "attack_type": "airground",
+    "moves_start": 2,
+    "cost": 9,
+    "race": "human"
+  },
+  "priest": {
+    "hp": 30,
+    "max_hp": 30,
+    "damage": 4,
+    "speed": 1,
+    "regen": 2,
+    "type": "ground",
+    "attack_dist": 4,
+    "attack_type": "airground",
+    "moves_start": 2,
+    "cost": 10,
+    "race": "human",
+    "heal": 10
+  },
+  "grunt": {
+    "hp": 100,
+    "max_hp": 100,
+    "damage": 12,
+    "speed": 1,
+    "regen": 6,
+    "type": "ground",
+    "attack_dist": 1,
+    "attack_type": "ground",
+    "moves_start": 2,
+    "cost": 8,
+    "race": "horde"
+  },
+  "headhunter": {
+    "hp": 75,
+    "max_hp": 75,
+    "damage": 16,
+    "speed": 1,
+    "regen": 4,
+    "type": "ground",
+    "attack_dist": 3,
+    "attack_type": "airground",
+    "moves_start": 2,
+    "cost": 7,
+    "race": "horde"
+  },
+  "bomber": {
+    "hp": 45,
+    "max_hp": 45,
+    "damage": 3,
+    "speed": 1,
+    "regen": 2,
+    "type": "ground",
+    "attack_dist": 1,
+    "attack_type": "ground",
+    "moves_start": 2,
+    "cost": 10,
+    "bomb_damage": 40,
+    "bomb_radius": 1,
+    "race": "horde"
+  }
+}
