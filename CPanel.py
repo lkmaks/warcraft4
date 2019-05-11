@@ -95,7 +95,6 @@ class CPanel:
             if but.text_surface:
                 self.game.screen.blit(but.text_surface, (but.rect.left + but.left, but.rect.top + but.top))
 
-
     def get_button(self, pos):
         for e in self.buttons:
             if self.buttons[e].rect.collidepoint(pos):

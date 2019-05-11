@@ -1,7 +1,8 @@
+import os
 
 def mapgen(is_gold, spawn1, spawn2):
     arr = None
-    with open('map.txt') as file:
+    with open(os.path.dirname(os.path.abspath(__file__)) + '/map.txt') as file:
         for s in file:
             s = s.strip()
             if s == "is_gold":
@@ -13,4 +14,4 @@ def mapgen(is_gold, spawn1, spawn2):
             else:
                 x, y = map(int, s.split())
                 arr[x][y] = True
-        
+

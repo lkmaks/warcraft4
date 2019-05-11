@@ -1,5 +1,7 @@
-from Units import Unit
+import Units
 from math import floor
+from GenerateNeutralsStrategies import *
+from NeutralsActStrategies import *
 
 def limit_reduce(cnt_units, gold):
     if cnt_units > 3:
@@ -11,6 +13,12 @@ def limit_reduce(cnt_units, gold):
 
 
 class Rules:
+    MATE_MORALE = 6
+    SUBORDINATE_MORALE = 10
+    MORAL_DECREASE_STEP = 5
+    NEUTRAL_GENERATING_STRATEGY = NormalRandomNeutralsGenerateStrategy
+    NEUTRAL_ACT_STRATEGY = NormalCalmNeutralsActStrategy
+
     def __init__(self, game):
         self.game = game
 
@@ -21,7 +29,7 @@ class Rules:
         cnt_units = 0
         for i in range(len(arr)):
             for j in range(len(arr[i])):
-                if isinstance(arr[i][j], Unit) and arr[i][j].owner == player:
+                if isinstance(arr[i][j], Units.Unit) and arr[i][j].owner == player:
                     if self.game.board.is_gold[i][j]:
                         cnt_gold += 1
                     cnt_units += 1

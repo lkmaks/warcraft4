@@ -1,7 +1,18 @@
 import pygame
 from pygame import Rect
 from Constants import Colors
+from Rules import Rules
 import json
+import os
+
+
+def sign(x):
+    if x == 0:
+        return 0
+    elif x > 0:
+        return 1
+    else:
+        return -1
 
 
 def dist(a, b):
@@ -18,14 +29,21 @@ class Unit():
         self.hp = self.max_hp = self.damage = self.speed = None
         self.regen = self.type = self.attack_dist = self.cell = None
         self.owner = self.moves_start = self.cost = self.board = None
+        self.morale = 0
+        self.parent = None
+        self.children = set()
 
         for key in kwargs:
             self.__setattr__(key, kwargs[key])
-        self.chosen = False
+        self.chosen = self.chosen_to_bound = False
         self.moves_left = self.moves_start
 
-    def die(self):
+    def die(self, died_from=None):
+        died_from.owner.get_reward(self)
         self.board.units_array[self.cell[0]][self.cell[1]] = None
+        for unit in self.children:
+            unit.parent = self.parent
+            unit.cascade_morale_decrease_after_death(self.morale * 5, 0)
 
     def move_to(self, cell):
         self.board.units_array[self.cell[0]][self.cell[1]] = None
@@ -34,9 +52,9 @@ class Unit():
 
     def attack(self, unit, damage=None):
         """ a """
-        unit.hp -= (damage if damage else self.damage)
+        unit.hp -= (damage if damage else self.damage + sign(self.morale) * (abs(self.morale) // 10))
         if unit.hp <= 0:
-            unit.die()
+            unit.die(self)
         return True
 
     def act_with_ally(self, unit):
@@ -68,6 +86,7 @@ class Unit():
 
     def take_action(self, cell):
         """ assuming able() == True """
+        print(self.cell, cell)
         if self.board.units_array[cell[0]][cell[1]] is None:
             self.move_to(cell)
             self.moves_left -= 1
@@ -84,15 +103,20 @@ class Unit():
         sx, sy = self.board.get_coords(self.cell)
         d = self.board.cell_size
 
-        img = pygame.image.load('img/{}.png'.format(self.name))
+        img = pygame.image.load(os.path.dirname(os.path.abspath(__file__)) + '/img/{}.png'.format(self.name))
         self.board.game.screen.blit(img, Rect((sx + 1, sy + 1, sx + d, sy + d)))
 
         font = pygame.font.SysFont('Comic Sans MS', 30)
         ts = font.render(str(self.hp), False, (0,  200, 0))
         self.board.game.screen.blit(ts, (sx, sy, sx + d, sy + d))
 
+        ts = font.render(str(self.morale), False, (200, 200, 0))
+        self.board.game.screen.blit(ts, (sx + d - 25, sy + d - 20, sx + d, sy + d))
+
         if self.chosen:
             pygame.draw.rect(self.board.game.screen, Colors.PINKRED, (sx + d - 10, sy + d - 10, 10, 10))
+        if self.chosen_to_bound:
+            pygame.draw.rect(self.board.game.screen, Colors.CHOSEN_TO_BOUND, (sx + d - 10, sy + d - 10, 10, 10))
 
     def end_of_our_move(self):
         self.moves_left = self.moves_start
@@ -103,6 +127,42 @@ class Unit():
     def end_of_their_move(self):
         self.end_of_our_move()
 
+    def set_parent(self, parent_unit):
+        self.parent = parent_unit
+        if not parent_unit == self:
+            self.morale = len(self.parent.children) * Rules.MATE_MORALE
+            self.parent.children.add(self)
+            for unit in self.parent.children:
+                if unit != self:
+                    unit.morale += Rules.MATE_MORALE
+            unit = parent_unit
+            while not unit is None:
+                unit.morale += Rules.SUBORDINATE_MORALE
+                unit = unit.parent
+
+    def able_to_set_parent(self, parent_unit):
+        if not self.parent is None:
+            return False
+        unit = parent_unit
+        while not unit is None:
+            if unit == self:
+                return False
+            unit = unit.parent
+        return True
+
+    def cascade_morale_decrease_after_death(self, value, depth):
+        if value <= 0:
+            return
+        self.morale -= value
+        for unit in self.children:
+            unit.cascade_morale_decrease_after_death(value - Rules.MORAL_DECREASE_STEP, depth)
+
+    def act(self, strategy):
+        # method of acting according to the strategy {strategy}
+        cell = strategy.get_action_cell(self, self.board)
+        if self.able(cell):
+            self.take_action(cell)
+
 
 class UnitFactory:
     def __init__(self, player, game):
@@ -110,7 +170,7 @@ class UnitFactory:
         self.game = game
         self.unit_names = set()
         self.unit_cost = dict()
-        with open('units_data.json') as file:
+        with open(os.path.dirname(os.path.abspath(__file__)) + '/units_data.json') as file:
             data = json.loads(file.read())
             for key in data:
                 if data[key]['race'] == self.player.race:
@@ -126,7 +186,6 @@ class UnitFactory:
             return False
         return True
 
-
     def affordable(self, name):
         """ Same as creatable, but without the context of cell """
         if name not in self.unit_names:
@@ -140,7 +199,7 @@ class UnitFactory:
         creates unit owned by <player> with given name and proper characteristics, putting him in the <cell>
         assume it is possible - that means player has enough gold, can drop unit on the cell and can produce this type
         """
-        with open('units_data.json', 'r') as file:
+        with open(os.path.dirname(os.path.abspath(__file__)) + '/units_data.json', 'r') as file:
             data = json.loads(file.read(), encoding='utf-8')
         unit = None
         if name in data.keys():

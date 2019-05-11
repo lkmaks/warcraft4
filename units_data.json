@@ -79,5 +79,31 @@
     "bomb_damage": 40,
     "bomb_radius": 1,
     "race": "horde"
+  },
+  "gnoll": {
+    "hp": 30,
+    "max_hp": 30,
+    "damage": 8,
+    "speed": 1,
+    "regen": 3,
+    "type": "ground",
+    "attack_dist": 2,
+    "attack_type": "ground",
+    "moves_start": 2,
+    "cost": 25,
+    "race": "neutral"
+  },
+  "golem": {
+    "hp": 150,
+    "max_hp": 150,
+    "damage": 30,
+    "speed": 1,
+    "regen": 4,
+    "type": "ground",
+    "attack_dist": 1,
+    "moves_start": 1,
+    "attack_type": "ground",
+    "cost": 80,
+    "race": "neutral"
   }
 }

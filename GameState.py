@@ -17,4 +17,5 @@ class GameState:
         self.state = 0
         if isinstance(self.chosen_unit, Unit):
             self.chosen_unit.chosen = False
+            self.chosen_unit.chosen_to_bound = False
         self.chosen_unit = None

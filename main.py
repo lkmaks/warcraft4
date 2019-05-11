@@ -2,7 +2,8 @@ from Game import Game
 from Player import Player
 
 
-player1 = Player(race='horde', start_gold=10, name='Grubby')
-player2 = Player(race='human', start_gold=10, name='a1sok')
+player1 = Player(race='horde', start_gold=10, name='Grubby', number=1)
+player2 = Player(race='human', start_gold=10, name='Hawk', number=2)
 game = Game(player1, player2)
+
 game.run()

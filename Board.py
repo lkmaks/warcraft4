@@ -1,13 +1,42 @@
 import pygame
 from Constants import Colors
-from Units import Unit
 from mapgen import mapgen
+from pygame.math import Vector2 as Vec
+import math
+
+
+def apply_vec(pos, vec):
+    return (pos[0] + vec.x, pos[1] + vec.y)
+
+
+def add_next_by_vector(arr, vec):
+    arr.append(apply_vec(arr[len(arr) - 1], vec))
+
+
+def draw_arrow(pos_from, pos_to, color, screen):
+    H = 15
+    alpha = 20
+    W = 2
+
+    alpha_rad = alpha * (math.pi / 180)
+    v0 = Vec(pos_from[0] - pos_to[0], pos_from[1] - pos_to[1])
+    dir = v0.normalize()
+    arr = [pos_to]
+    add_next_by_vector(arr, dir.rotate(alpha) * H / math.cos(alpha_rad))
+    add_next_by_vector(arr, dir.rotate(-90) * (H * math.tan(alpha_rad) - W / 2))
+    add_next_by_vector(arr, dir * (math.hypot(v0.x, v0.y) - H))
+    add_next_by_vector(arr, dir.rotate(-90) * W)
+    add_next_by_vector(arr, -dir * (math.hypot(v0.x, v0.y) - H))
+    add_next_by_vector(arr, dir.rotate(-90) * (H * math.tan(alpha_rad) - W / 2))
+    add_next_by_vector(arr, -dir.rotate(-alpha) * H / math.cos(alpha_rad))
+    pygame.draw.polygon(screen, color, arr)
+
 
 class Board:
     def __init__(self, game):
         self.width = 15
         self.height = 15
-        self.cell_size = 50
+        self.cell_size = 60
         self.left_offset = 40
         self.right_offset = 40
         self.top_offset = 40
@@ -55,6 +84,16 @@ class Board:
                 if self.units_array[i][j]:
                     self.units_array[i][j].render()
 
+        if self.game.render_mode == 'subordination':
+            for i in range(self.width):
+                for j in range(self.height):
+                    if not self.units_array[i][j] is None:
+                        pos_from = self.get_center_coords((i, j))
+                        for unit in self.units_array[i][j].children:
+                            pos_to = self.get_center_coords(unit.cell)
+                            color = Colors.PLAYER_1_ARROW if unit.owner.number == 1 else Colors.PLAYER_2_ARROW
+                            draw_arrow(pos_from, pos_to, color, self.game.screen)
+
     def get_cell(self, pos):
         x, y = pos
         ix = (x - self.left_offset) // self.cell_size
@@ -66,9 +105,30 @@ class Board:
 
     def get_coords(self, cell):
         """ returns coordinate on screen for left top corner of the cell """
-        i, j = cell
+        i, j = cell 
         return (self.left_offset + i * self.cell_size, self.top_offset + j * self.cell_size)
+
+    def get_center_coords(self, cell):
+        pos = self.get_coords(cell)
+        return (pos[0] + self.cell_size // 2, pos[1] + self.cell_size // 2)
 
     def can_drop_unit_to(self, cell, player):
         arr = self.spawn1 if player == self.game.player1 else self.spawn2
         return self.units_array[cell[0]][cell[1]] is None and arr[cell[0]][cell[1]]
+
+    def endmove(self):
+        for i in range(len(self.units_array)):
+            for j in range(len(self.units_array[i])):
+                if not self.units_array[i][j] is None and \
+                        self.units_array[i][j].owner == self.game.gamestate.player:
+                    self.units_array[i][j].end_of_our_move()
+                elif not self.units_array[i][j] is None and \
+                        self.units_array[i][j].owner != self.game.gamestate.player:
+                    self.units_array[i][j].end_of_their_move()
+
+    def generate_neutrals(self, strategy):
+        arr_neutrals = strategy.generate_unit_names_array(self.units_array, self.spawn1,
+                                                     self.spawn2, self.game.factoryNeutral.unit_names)
+        for i in range(len(arr_neutrals)):
+            for j in range(len(arr_neutrals[i])):
+                self.game.factoryNeutral.create_unit(arr_neutrals[i][j], (i, j))
