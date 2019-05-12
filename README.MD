@@ -1,7 +1,7 @@
 Проект написан с использованием pygame на python 3.
 
-Запуск: python main.py
 Предварительно: pip install -r requirements.txt
+Запуск: python main.py
 Запускайте в виртуальном окружении, построенном на python 3.7
 
 Объяснение архитектуры создания юнитов в файле architecture_producing.txt

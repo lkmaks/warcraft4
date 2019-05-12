@@ -22,7 +22,7 @@ class NormalCalmNeutralsActStrategy:
 
     def get_action_cell(self, unit, board):
         options = []
-        if random.randint(1, 2) == 1:
+        if random.randint(1, 10) > 1:
             # attack
             for cell in get_around_cells(unit.cell, unit.attack_dist, len(board.units_array), len(board.units_array[0])):
                 if not board.units_array[cell[0]][cell[1]] is None \
@@ -33,5 +33,4 @@ class NormalCalmNeutralsActStrategy:
             for cell in get_around_cells(unit.cell, unit.speed, len(board.units_array), len(board.units_array[0])):
                 if board.units_array[cell[0]][cell[1]] is None:
                     options.append(cell)
-        # print(options)
         return random.choice(options) if len(options) > 0 else unit.cell

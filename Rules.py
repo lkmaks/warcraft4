@@ -52,3 +52,27 @@ class Rules:
                 return 0
         else:
             return 0
+
+    @staticmethod
+    def get_percentage(armor, damage_type):
+        if armor == 'light':
+            if damage_type == 'normal':
+                return 1
+            elif damage_type == 'pierce':
+                return 2
+            elif damage_type == 'magic':
+                return 1.25
+        elif armor == 'medium':
+            if damage_type == 'normal':
+                return 1.5
+            elif damage_type == 'pierce':
+                return 0.75
+            elif damage_type == 'magic':
+                return 0.75
+        elif armor == 'heavy':
+            if damage_type == 'normal':
+                return 1
+            elif damage_type == 'pierce':
+                return 1
+            elif damage_type == 'magic':
+                return 2

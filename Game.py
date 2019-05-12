@@ -181,9 +181,15 @@ class Game:
                 if event.type == pygame.QUIT:
                     sys.exit()
                 elif event.type == pygame.MOUSEBUTTONUP:
-                    self.handle_mouseup(event.pos, event.button)
+                    try:
+                        self.handle_mouseup(event.pos, event.button)
+                    except Exception:
+                        print('Error =(')
                 elif event.type == pygame.KEYUP:
-                    self.handle_keyup(event.key)
+                    try:
+                        self.handle_keyup(event.key)
+                    except Exception:
+                        print("Error =(")
             self.render()
             pygame.display.flip()
 

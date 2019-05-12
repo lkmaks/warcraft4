@@ -4,6 +4,7 @@ from Constants import Colors
 from Rules import Rules
 import json
 import os
+from BattleActions import *
 
 
 def sign(x):
@@ -38,30 +39,16 @@ class Unit():
         self.chosen = self.chosen_to_bound = False
         self.moves_left = self.moves_start
 
-    def die(self, died_from=None):
-        died_from.owner.get_reward(self)
-        self.board.units_array[self.cell[0]][self.cell[1]] = None
-        for unit in self.children:
-            unit.parent = self.parent
-            unit.cascade_morale_decrease_after_death(self.morale * 5, 0)
-
-    def move_to(self, cell):
-        self.board.units_array[self.cell[0]][self.cell[1]] = None
-        self.board.units_array[cell[0]][cell[1]] = self
-        self.cell = cell
-
-    def attack(self, unit, damage=None):
-        """ a """
-        unit.hp -= (damage if damage else self.damage + sign(self.morale) * (abs(self.morale) // 10))
-        if unit.hp <= 0:
-            unit.die(self)
-        return True
-
-    def act_with_ally(self, unit):
-        if self.name == "priest":
-            unit.hp += self.heal
-            unit.hp = min(unit.hp, unit.max_hp)
-        if self.name == "bomber" and unit == self:
+    def accept_battle_action(self, action):
+        action.log()
+        if type(action) == NormalUnitAttack:
+            self.hp -= int(action.damage * Rules.get_percentage(self.armor, action.damage_type))
+            if self.hp <= 0:
+                self.die(action.source)
+        elif type(action) == PriestHeal:
+            self.hp += action.heal
+            self.hp = min(self.hp, self.max_hp)
+        elif type(action) == BomberDetonation:
             for r in range(1, self.bomb_radius + 1):
                 s = set()
                 x, y = self.cell
@@ -73,8 +60,36 @@ class Unit():
                 for pos in s:
                     other_unit = self.board.units_array[pos[0]][pos[1]]
                     if not other_unit is None:
-                        self.attack(other_unit, self.bomb_damage)
+                        attack = NormalUnitAttack(self.bomb_damage, self.bomb_damage_type, self, other_unit)
+                        other_unit.accept_battle_action(attack)
                 self.die()
+
+    def die(self, died_from=None):
+        if died_from:
+            died_from.owner.get_reward(self)
+        self.board.units_array[self.cell[0]][self.cell[1]] = None
+        for unit in self.children:
+            unit.parent = self.parent
+            unit.cascade_morale_decrease_after_death(self.morale * 5, 0)
+
+    def move_to(self, cell):
+        self.board.units_array[self.cell[0]][self.cell[1]] = None
+        self.board.units_array[cell[0]][cell[1]] = self
+        self.cell = cell
+
+    def act_with_enemy(self, unit):
+        attack = NormalUnitAttack(max(0, self.damage + self.morale // 5), self.damage_type, self, unit)
+        unit.accept_battle_action(attack)
+        return True
+
+    def act_with_ally(self, unit):
+        if self.name == "priest":
+            action = PriestHeal(self.heal, self, unit)
+            unit.accept_battle_action(action)
+        elif self.name == "bomber" and unit == self:
+            action = BomberDetonation(self.bomb_damage, self.bomb_radius, self)
+            self.accept_battle_action(action)
+        return True
 
     def able(self, cell):
         if self.moves_left == 0:
@@ -86,14 +101,13 @@ class Unit():
 
     def take_action(self, cell):
         """ assuming able() == True """
-        print(self.cell, cell)
         if self.board.units_array[cell[0]][cell[1]] is None:
             self.move_to(cell)
             self.moves_left -= 1
         else:
             unit = self.board.units_array[cell[0]][cell[1]]
             if unit.owner != self.owner and attack_is_possible(self.type, unit.type):
-                if self.attack(unit):
+                if self.act_with_enemy(unit):
                     self.moves_left -= 1
             else:
                 if self.act_with_ally(unit):

@@ -10,7 +10,9 @@
     "attack_type": "ground",
     "moves_start": 2,
     "cost": 4,
-    "race": "human"
+    "race": "human",
+    "damage_type": "normal",
+    "armor": "medium"
   },
   "rifleman": {
     "hp": 60,
@@ -23,7 +25,9 @@
     "attack_type": "airground",
     "moves_start": 2,
     "cost": 9,
-    "race": "human"
+    "race": "human",
+    "damage_type": "pierce",
+    "armor": "light"
   },
   "priest": {
     "hp": 30,
@@ -37,7 +41,9 @@
     "moves_start": 2,
     "cost": 10,
     "race": "human",
-    "heal": 10
+    "heal": 10,
+    "damage_type": "magic",
+    "armor": "light"
   },
   "grunt": {
     "hp": 100,
@@ -50,7 +56,9 @@
     "attack_type": "ground",
     "moves_start": 2,
     "cost": 8,
-    "race": "horde"
+    "race": "horde",
+    "damage_type": "normal",
+    "armor": "heavy"
   },
   "headhunter": {
     "hp": 75,
@@ -63,7 +71,9 @@
     "attack_type": "airground",
     "moves_start": 2,
     "cost": 7,
-    "race": "horde"
+    "race": "horde",
+    "damage_type": "pierce",
+    "armor": "light"
   },
   "bomber": {
     "hp": 45,
@@ -78,7 +88,10 @@
     "cost": 10,
     "bomb_damage": 40,
     "bomb_radius": 1,
-    "race": "horde"
+    "bomb_damage_type": "pierce",
+    "race": "horde",
+    "damage_type": "normal",
+    "armor": "light"
   },
   "gnoll": {
     "hp": 30,
@@ -89,9 +102,11 @@
     "type": "ground",
     "attack_dist": 2,
     "attack_type": "ground",
-    "moves_start": 2,
+    "moves_start": 1,
     "cost": 25,
-    "race": "neutral"
+    "race": "neutral",
+    "damage_type": "magic",
+    "armor": "light"
   },
   "golem": {
     "hp": 150,
@@ -104,6 +119,8 @@
     "moves_start": 1,
     "attack_type": "ground",
     "cost": 80,
-    "race": "neutral"
+    "race": "neutral",
+    "damage_type": "normal",
+    "armor": "heavy"
   }
 }
