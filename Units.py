@@ -157,6 +157,8 @@ class Unit():
     def able_to_set_parent(self, parent_unit):
         if not self.parent is None:
             return False
+        if len(self.children) > 0:
+            return False
         unit = parent_unit
         while not unit is None:
             if unit == self:
