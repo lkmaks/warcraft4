@@ -10,7 +10,7 @@ class Player:
         self.number = number
 
     def get_reward(self, unit):
-        if unit.owner == "Neutrals":
+        if unit.owner.name == "Neutrals":
             self.gold += unit.cost
 
     def act(self):
