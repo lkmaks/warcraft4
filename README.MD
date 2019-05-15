@@ -1,8 +1,10 @@
 Проект написан с использованием pygame на python 3.
 
-Предварительно: pip install -r requirements.txt
-Запуск: python main.py
-Запускайте в виртуальном окружении, построенном на python 3.7
+Установка и запуск: (требуется установленный python 3 версии под alias python3)
+1) Склонировать репозиторий и перейти в его директорию.
+2) virtualenv -p python3 venv
+3) venv/bin/pip install -r requirements.txt
+4) venv/bin/python main.py
 
 Правила игры в файле game_rules.txt
 Архитектура в game_architecture.txt
